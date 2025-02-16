@@ -1,0 +1,14 @@
+# Go build artifacts
+*.exe
+*.out
+*.o
+*.a
+*.so
+
+# Dependency directories
+vendor/
+bin/
+obj/
+
+# Environment files
+.env
