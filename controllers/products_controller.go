@@ -17,16 +17,25 @@ type ProductRequest struct {
 
 func CreateProduct(c *gin.Context) {
 	var req ProductRequest
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request format",
+			"correct_json": ProductRequest{
+				Name:        "Example Product",
+				Type:        "Example Type",
+				ShelfParent: "A",
+				ShelfChild:  "A1",
+			},
+		})
 		return
 	}
 
 	var shelf models.Shelf
-	if err := config.DB.Where("shelf_parent = ? AND shelf_child = ?", req.ShelfParent, req.ShelfChild).
-		FirstOrCreate(&shelf, models.Shelf{ShelfParent: req.ShelfParent, ShelfChild: req.ShelfChild}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create/find shelf"})
+	if err := config.DB.Where("shelf_parent = ? AND shelf_child = ?", req.ShelfParent, req.ShelfChild).First(&shelf).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "Shelf not found",
+			"message": "The provided shelf and shelf path do not exist. Please create them first.",
+		})
 		return
 	}
 
@@ -34,9 +43,8 @@ func CreateProduct(c *gin.Context) {
 	config.DB.Create(&product)
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Product created",
+		"message": "Product created successfully",
 		"product": product,
-		"shelf":   shelf,
 	})
 }
 
@@ -50,9 +58,6 @@ func GetProductLocation(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"Product":     product.Name,
-		"Type":        product.Type,
-		"ShelfChild":  product.Shelf.ShelfChild,
-		"ShelfParent": product.Shelf.ShelfParent,
+		"Location": product.Shelf.ShelfChild,
 	})
 }

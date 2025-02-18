@@ -13,4 +13,3 @@ func ShelvesRoutes(r *gin.Engine) {
 		shelves.GET("/", controllers.GetShelves)
 	}
 }
-
