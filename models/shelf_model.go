@@ -20,6 +20,6 @@ func (p LtreePath) Value() (driver.Value, error) {
 
 type Shelf struct {
 	gorm.Model
-	ShelfParent string `gorm:"not null"`
-	ShelfChild  string `gorm:"type:ltree;not null;unique"`
+	ShelfParent string `gorm:"size:5"`
+	ShelfChild  string `gorm:"type:ltree;unique"`
 }
